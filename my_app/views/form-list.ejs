@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Formulários</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Lista de Formulários</h1>
+    </header>
+    <main>
+        <!-- Tabela para exibir os formulários -->
+        <table id="form-table" border="1">
+            <thead>
+                <tr>
+                    <th>Nome do Cliente</th>
+                    <th>Marca do Carro</th>
+                    <th>Modelo do Carro</th>
+                    <th>Ano do Carro</th>
+                    <th>Cor</th>
+                    <th>Data de Preenchimento</th>
+                    <th>Programação</th>
+                    <th>Serviço</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- As linhas dos formulários serão carregadas aqui -->
+            </tbody>
+        </table>
+
+        <!-- Botão para voltar à página inicial -->
+        <div class="button-container">
+            <a href="/" class="btn">Voltar para a Página Inicial</a>
+        </div>
+    </main>
+
+    <script>
+        // Função para carregar os formulários do IndexedDB e exibi-los na tabela
+        function loadForms() {
+            const request = indexedDB.open('formDatabase', 1);
+
+            request.onsuccess = (event) => {
+                const db = event.target.result;
+                const transaction = db.transaction(['forms'], 'readonly');
+                const objectStore = transaction.objectStore('forms');
+
+                const formTableBody = document.querySelector('#form-table tbody');
+                formTableBody.innerHTML = ''; // Limpa a tabela antes de adicionar os dados
+
+                objectStore.openCursor().onsuccess = (event) => {
+                    const cursor = event.target.result;
+
+                    if (cursor) {
+                        const formData = cursor.value;
+
+                        // Criando uma linha da tabela para cada formulário
+                        const row = document.createElement('tr');
+
+                        row.innerHTML = `
+                            <td>${formData.customerName}</td>
+                            <td>${formData.carBrand}</td>
+                            <td>${formData.carModel}</td>
+                            <td>${formData.carYear}</td>
+                            <td>${formData.carColor}</td>
+                            <td>${formData.formDate}</td>
+                            <td>${formData.programmingDate}</td>
+                            <td>${formData.serviceType}</td>
+                        `;
+
+                        formTableBody.appendChild(row);
+
+                        cursor.continue();
+                    } else {
+                        if (!formTableBody.hasChildNodes()) {
+                            const noDataRow = document.createElement('tr');
+                            noDataRow.innerHTML = `<td colspan="8">Nenhum formulário encontrado.</td>`;
+                            formTableBody.appendChild(noDataRow);
+                        }
+                    }
+                };
+            };
+
+            request.onerror = (event) => {
+                console.error('Erro ao abrir o banco de dados:', event.target.errorCode);
+            };
+        }
+
+        // Carregar os formulários quando a página for carregada
+        window.onload = loadForms;
+    </script>
+</body>
+</html>

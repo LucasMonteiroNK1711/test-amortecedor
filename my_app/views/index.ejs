@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Inicial - Empresa de Amortecedores</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Bem-vindo à Empresa de Amortecedores</h1>
+    </header>
+    <main>
+        <div class="button-container">
+            <a href="/" class="btn">Home</a>
+            <a href="/form" class="btn">Preencher Formulário</a>
+            <a href="/form-list" class="btn" id="list-form-button">Lista de Formulários</a>
+            <a href="/register" class="btn">Cadastro</a>
+        </div>
+    </main>
+
+    <script>
+        // Inicializar o IndexedDB ao carregar a página inicial
+        function initializeDB() {
+            const request = indexedDB.open('formDatabase', 1);
+
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains('forms')) {
+                    db.createObjectStore('forms', { keyPath: 'id', autoIncrement: true });
+                }
+            };
+
+            request.onsuccess = (event) => {
+                console.log('Banco de dados inicializado com sucesso');
+            };
+
+            request.onerror = (event) => {
+                console.error('Erro ao inicializar o banco de dados:', event.target.errorCode);
+            };
+        }
+
+        // Inicializar o banco de dados ao carregar a página inicial
+        window.onload = initializeDB;
+    </script>
+</body>
+</html>

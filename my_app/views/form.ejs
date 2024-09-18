@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preencher Formulário - Empresa de Amortecedores</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/db.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>Preencher Formulário</h1>
+    </header>
+    <main>
+        <form id="form" class="form-container">
+            <!-- Campos do formulário -->
+            <label for="customer-name">Nome do Cliente:</label>
+            <input type="text" id="customer-name" name="customerName" required>
+
+            <label for="car-brand">Marca do Carro:</label>
+            <input type="text" id="car-brand" name="carBrand" required>
+
+            <label for="car-model">Modelo do Carro:</label>
+            <input type="text" id="car-model" name="carModel" required>
+
+            <label for="car-year">Ano do Carro:</label>
+            <input type="number" id="car-year" name="carYear" required min="1900" max="2099" step="1">
+
+            <label for="car-color">Cor:</label>
+            <input type="text" id="car-color" name="carColor" required>
+
+            <label for="form-date">Data de Preenchimento:</label>
+            <input type="date" id="form-date" name="formDate" required>
+
+            <label for="programming-date">Programação:</label>
+            <input type="date" id="programming-date" name="programmingDate" required>
+
+            <label>Serviço:</label>
+            <div>
+                <input type="checkbox" id="new" name="serviceType" value="Novo">
+                <label for="new">Novo</label>
+            </div>
+            <div>
+                <input type="checkbox" id="replacement" name="serviceType" value="Reposição">
+                <label for="replacement">Reposição</label>
+            </div>
+            <div>
+                <input type="checkbox" id="maintenance" name="serviceType" value="Manutenção">
+                <label for="maintenance">Manutenção</label>
+            </div>
+
+            <button type="submit" class="btn">Enviar</button>
+        </form>
+
+        <!-- Botão para voltar para a página inicial -->
+        <div class="button-container">
+            <a href="/" class="btn">Voltar para a Página Inicial</a>
+        </div>
+    </main>
+
+    <script>
+        // Preencher automaticamente a data do dia no campo "Data de Preenchimento"
+        document.getElementById('form-date').valueAsDate = new Date();
+
+        // Manipular a seleção de serviços para permitir apenas uma opção
+        const checkboxes = document.querySelectorAll('input[name="serviceType"]');
+        checkboxes.forEach((checkbox) => {
+            checkbox.addEventListener('change', () => {
+                checkboxes.forEach((cb) => {
+                    if (cb !== checkbox) {
+                        cb.checked = false;
+                        cb.disabled = checkbox.checked;
+                    }
+                });
+            });
+        });
+
+        // Adicionar evento de envio do formulário
+        document.getElementById('form').addEventListener('submit', (event) => {
+            event.preventDefault(); // Impede o envio padrão do formulário
+
+            const formData = {
+                customerName: document.getElementById('customer-name').value,
+                carBrand: document.getElementById('car-brand').value,
+                carModel: document.getElementById('car-model').value,
+                carYear: document.getElementById('car-year').value,
+                carColor: document.getElementById('car-color').value,
+                formDate: document.getElementById('form-date').value,
+                programmingDate: document.getElementById('programming-date').value,
+                serviceType: Array.from(document.querySelectorAll('input[name="serviceType"]:checked')).map(cb => cb.value)
+            };
+
+            // Adicionar o formulário ao IndexedDB
+            if (typeof window.addForm === 'function') {
+                window.addForm(formData);
+                alert('Formulário enviado com sucesso!');
+                window.location.href = '/form-list'; // Redirecionar para a lista de formulários
+            } else {
+                console.error("A função addForm não está definida.");
+            }
+        });
+    </script>
+</body>
+</html>
